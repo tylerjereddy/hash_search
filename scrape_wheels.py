@@ -19,6 +19,9 @@ import tempfile
 import urllib.request
 import os
 
+# this is the known sha256 for libopenblasp-r0.3.0.dev.dylib
+# in the MacOS 64-bit wheel from a recent CRON job:
+known_sha256 ='L3iI-ISr5GviFRt1tc4Aqea4ObNYBPZWjnqQvtEwdLc'
 url = "https://3f23b170c54c2533c070-1c8a9b3114517dc5fe17b7c3f8c63a43.ssl.cf2.rackcdn.com/"
 html_page = requests.get(url)
 soup = BeautifulSoup(html_page.content, features='html5lib')
