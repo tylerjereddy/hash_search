@@ -47,7 +47,10 @@ for link in soup.findAll('a'):
                    if 'libopenblasp-r0.3.0.dev.dylib' in member.name:
                        # extract the file and check its hash against
                        # reference value
-                       with tarF.extractfile(member) as candidate:
+                       tarF.extract(member, path=tempdir)
+                       candidate_file = os.path.join(tempdir, member.name)
+                       print("candidate_file:", candidate_file)
+                       with open(candidate_file, 'rb') as candidate:
                            all_bytes = candidate.read()
                            hashval = hashlib.sha256(all_bytes).hexdigest()
                            print("hashval:", hashval)
