@@ -27,6 +27,7 @@ known_sha256 ='2f7888f884abe46be2151b75b5ce00a9e6b839b35804f6568e7a90bed13074b7'
 url = "https://3f23b170c54c2533c070-1c8a9b3114517dc5fe17b7c3f8c63a43.ssl.cf2.rackcdn.com/"
 html_page = requests.get(url)
 soup = BeautifulSoup(html_page.content, features='html5lib')
+num_matching_hashes = 0
 for link in soup.findAll('a'):
     filename = link.get('href')
     if ('openblas' in filename and
@@ -50,3 +51,8 @@ for link in soup.findAll('a'):
                            all_bytes = candidate.read()
                            hashval = hashlib.sha256(all_bytes).hexdigest()
                            print("hashval:", hashval)
+                           if hashval == known_sha256:
+                              num_matching_hashes += 1
+                              print("hashes match!!")
+
+print("Total number of matching hashes:", num_matching_hashes)
