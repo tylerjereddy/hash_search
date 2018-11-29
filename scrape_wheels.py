@@ -17,6 +17,7 @@ import tarfile
 import urllib
 import tempfile
 import urllib.request
+import os
 
 url = "https://3f23b170c54c2533c070-1c8a9b3114517dc5fe17b7c3f8c63a43.ssl.cf2.rackcdn.com/"
 html_page = requests.get(url)
@@ -32,7 +33,8 @@ for link in soup.findAll('a'):
          # download the tarfile to a temporary location
          with tempfile.TemporaryDirectory() as tempdir:
             download_url = urllib.parse.urljoin(url, filename)
-            urllib.request.urlretrieve(download_url, filename)
+            temp_filename = os.path.join(tempdir, filename)
+            urllib.request.urlretrieve(download_url, temp_filename)
             # inspect the downloaded tar file
-            with tarfile.open(filename, "r:gz") as tarF:
+            with tarfile.open(temp_filename, "r:gz") as tarF:
                print(tarF)
