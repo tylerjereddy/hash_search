@@ -18,6 +18,8 @@ import urllib
 import tempfile
 import urllib.request
 import os
+from pathlib import Path
+import hashlib
 
 # this is the known sha256 for libopenblasp-r0.3.0.dev.dylib
 # in the MacOS 64-bit wheel from a recent CRON job:
@@ -40,4 +42,11 @@ for link in soup.findAll('a'):
             urllib.request.urlretrieve(download_url, temp_filename)
             # inspect the downloaded tar file
             with tarfile.open(temp_filename, "r:gz") as tarF:
-               print(tarF)
+               for member in tarF:
+                   if 'libopenblasp-r0.3.0.dev.dylib' in member.name:
+                       # extract the file and check its hash against
+                       # reference value
+                       with tarF.extractfile(member) as candidate:
+                           all_bytes = candidate.read()
+                           hashval = hashlib.sha256(all_bytes).hexdigest()
+                           print("hashval:", hashval)
