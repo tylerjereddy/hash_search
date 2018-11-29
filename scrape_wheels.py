@@ -28,14 +28,13 @@ url = "https://3f23b170c54c2533c070-1c8a9b3114517dc5fe17b7c3f8c63a43.ssl.cf2.rac
 html_page = requests.get(url)
 soup = BeautifulSoup(html_page.content, features='html5lib')
 num_matching_hashes = 0
+num_matching_file_sizes = 0
 for link in soup.findAll('a'):
     filename = link.get('href')
     if ('openblas' in filename and
-        '0.3.0' in filename and
         ('Darwin' in filename or
          'osx' in filename)):
          # these files are all of type *.tar.gz
-         print(filename)
          # download the tarfile to a temporary location
          with tempfile.TemporaryDirectory() as tempdir:
             download_url = urllib.parse.urljoin(url, filename)
@@ -49,7 +48,15 @@ for link in soup.findAll('a'):
                        # reference value
                        tarF.extract(member, path=tempdir)
                        candidate_file = os.path.join(tempdir, member.name)
-                       print("candidate_file:", candidate_file)
+                       # we know the candidate file has to be 93 MB to match
+                       candidate_size = os.path.getsize(candidate_file) >> 20
+                       if candidate_size != 93:
+                           break
+                       else:
+                           num_matching_file_sizes += 1
+                       print("-" * 20)
+                       print("**candidate_file with matching size:", candidate_file)
+                       print("archive URL:", download_url)
                        with open(candidate_file, 'rb') as candidate:
                            all_bytes = candidate.read()
                            hashval = hashlib.sha256(all_bytes).hexdigest()
@@ -57,5 +64,7 @@ for link in soup.findAll('a'):
                            if hashval == known_sha256:
                               num_matching_hashes += 1
                               print("hashes match!!")
+                       print("-" * 20)
 
+print("Total number of matching file sizes:", num_matching_file_sizes)
 print("Total number of matching hashes:", num_matching_hashes)
